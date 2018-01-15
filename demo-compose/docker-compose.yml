@@ -1,0 +1,47 @@
+version: "3.4"
+
+services:
+  api:
+    image: docker-demo:v2-api
+    container_name: docker-demo-v2-api
+
+    # Configuration options that are applied at build time.
+    build:
+      context: ./api
+
+    env_file: .env
+
+    environment:
+      APP_DB_USER: $APP_DB_USER
+      APP_DB_PASSWORD: $APP_DB_PASSWORD
+      APP_DB_NAME: $APP_DB_NAME
+
+    ports:
+      - 8000:80
+
+    # Dependencies between services.
+    depends_on:
+      - postgres
+
+    volumes:
+      # Use the host source code as working dir in the container.
+      - ./src:/usr/src/app
+
+  postgres:
+    image: docker-demo:v2-postgres
+    container_name: docker-demo-v2-postgres
+
+    # Configuration options that are applied at build time.
+    build:
+      context: ./postgres
+
+    env_file: .env
+
+    environment:
+      APP_DB_USER: $APP_DB_USER
+      APP_DB_PASSWORD: $APP_DB_PASSWORD
+      APP_DB_NAME: $APP_DB_NAME
+
+    volumes:
+      # Store PostgreSQL data dir outside the container.
+      - ./var/postgres:/var/lib/postgresql/data
